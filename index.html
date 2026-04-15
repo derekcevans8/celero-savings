@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Free Payment Savings Analysis | Derek Evans · Celero Commerce Partner</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy: #0a1628; --blue: #1a4a8a; --blue-light: #2563b0;
+  --gold: #c8922a; --gold-light: #e8b84b; --cream: #f8f5f0; --cream-dark: #ede9e2;
+  --white: #ffffff; --text-dark: #0a1628; --text-mid: #3d5070; --text-light: #6b7fa3;
+  --green: #1a6e4a; --green-light: #e8f5ef; --red-light: #fdf0ee; --red: #8b2a1a;
+  --border: rgba(10,22,40,0.12); --radius: 12px; --radius-lg: 20px;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text-dark); min-height: 100vh; line-height: 1.6; }
+
+/* HERO */
+.hero { background: var(--navy); padding: 48px 24px 68px; text-align: center; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(26,74,138,0.5) 0%, transparent 70%); pointer-events: none; }
+.hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(200,146,42,0.15); border: 1px solid rgba(200,146,42,0.3); color: var(--gold-light); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 14px; border-radius: 40px; margin-bottom: 20px; }
+.hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(28px, 5vw, 48px); color: var(--white); line-height: 1.15; max-width: 600px; margin: 0 auto 16px; }
+.hero h1 em { font-style: italic; color: var(--gold-light); }
+.hero p { font-size: 16px; color: rgba(255,255,255,0.65); max-width: 460px; margin: 0 auto 28px; font-weight: 300; }
+.hero-stats { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; margin-bottom: 28px; }
+.hero-stat .num { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--gold-light); display: block; }
+.hero-stat .lbl { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 300; }
+.celero-partnership { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 40px; padding: 8px 18px; font-size: 12px; color: rgba(255,255,255,0.6); }
+.celero-partnership strong { color: rgba(255,255,255,0.9); font-weight: 500; }
+.celero-partnership .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold-light); flex-shrink: 0; }
+
+/* LAYOUT */
+.container { max-width: 640px; margin: -28px auto 60px; padding: 0 16px; position: relative; z-index: 10; }
+.progress-wrap { background: var(--white); border-radius: 16px 16px 0 0; border: 1px solid var(--border); border-bottom: none; padding: 16px 24px 0; }
+.progress-steps { display: flex; align-items: center; }
+.p-step { flex: 1; text-align: center; }
+.p-step .p-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--cream-dark); color: var(--text-light); font-size: 12px; font-weight: 500; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; transition: background 0.3s, color 0.3s; }
+.p-step.active .p-dot { background: var(--navy); color: white; }
+.p-step.done .p-dot { background: var(--green); color: white; }
+.p-step .p-label { font-size: 11px; color: var(--text-light); }
+.p-step.active .p-label { color: var(--text-dark); font-weight: 500; }
+.p-step.done .p-label { color: var(--green); }
+.p-line { flex: 1; height: 2px; background: var(--cream-dark); margin-bottom: 22px; max-width: 60px; transition: background 0.3s; }
+.p-line.done { background: var(--green); }
+.card { background: var(--white); border-radius: 0 0 var(--radius-lg) var(--radius-lg); border: 1px solid var(--border); border-top: none; overflow: hidden; box-shadow: 0 8px 40px rgba(10,22,40,0.10); }
+.card-body { padding: 24px 24px 28px; }
+
+/* FORM */
+.step-panel { display: none; }
+.step-panel.active { display: block; }
+.step-header { margin-bottom: 20px; }
+.step-header h2 { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text-dark); margin-bottom: 4px; }
+.step-header p { font-size: 14px; color: var(--text-light); }
+.field-group { margin-bottom: 16px; }
+.field-group label { display: block; font-size: 13px; font-weight: 500; color: var(--text-mid); margin-bottom: 5px; letter-spacing: 0.02em; }
+.req { color: var(--gold); margin-left: 2px; }
+.opt { color: var(--text-light); font-size: 11px; font-weight: 400; margin-left: 4px; }
+input[type=text], input[type=email], input[type=tel], input[type=password], select, textarea { width: 100%; padding: 11px 14px; font-size: 15px; font-family: 'DM Sans', sans-serif; background: var(--cream); border: 1.5px solid transparent; border-radius: var(--radius); color: var(--text-dark); outline: none; transition: border-color 0.15s, background 0.15s; appearance: none; }
+input:focus, select:focus, textarea:focus { border-color: var(--blue-light); background: var(--white); }
+input::placeholder, textarea::placeholder { color: var(--text-light); font-weight: 300; }
+textarea { height: 78px; resize: vertical; }
+select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7fa3' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media(max-width:500px) { .row2 { grid-template-columns: 1fr; } }
+.section-divider { display: flex; align-items: center; gap: 12px; margin: 22px 0 16px; }
+.section-divider span { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-light); white-space: nowrap; }
+.section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ISV QUALIFIER */
+.isv-qualifier { display: none; background: rgba(26,74,138,0.04); border: 1px solid rgba(26,74,138,0.15); border-radius: var(--radius); padding: 16px; margin-top: 10px; }
+.isv-qualifier-title { font-size: 13px; font-weight: 500; color: var(--text-mid); margin-bottom: 12px; }
+.isv-q { margin-bottom: 12px; font-size: 13px; color: var(--text-mid); }
+.isv-q .q-text { margin-bottom: 6px; line-height: 1.5; }
+.isv-q label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; margin-right: 14px; font-weight: 400; }
+.isv-q input[type=radio] { width: auto; accent-color: var(--blue); }
+
+/* PAIN CHECKS */
+.pain-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+@media(max-width:460px) { .pain-grid { grid-template-columns: 1fr; } }
+.pain-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 10px; cursor: pointer; transition: border-color 0.12s, background 0.12s; font-size: 13px; color: var(--text-mid); user-select: none; }
+.pain-item:hover { border-color: rgba(26,74,138,0.3); background: rgba(26,74,138,0.03); }
+.pain-item input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--blue); flex-shrink: 0; cursor: pointer; }
+.pain-item.checked { border-color: var(--blue-light); background: rgba(37,99,176,0.05); color: var(--blue); }
+
+/* UPLOAD */
+.upload-zone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 26px 20px; text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.upload-zone:hover { border-color: var(--blue-light); background: rgba(26,74,138,0.02); }
+.upload-zone.has-file { border-color: var(--green); border-style: solid; background: var(--green-light); }
+.upload-icon { font-size: 26px; margin-bottom: 8px; }
+.upload-zone h3 { font-size: 14px; font-weight: 500; color: var(--text-dark); margin-bottom: 3px; }
+.upload-zone p { font-size: 13px; color: var(--text-light); }
+.upload-zone .file-name { font-size: 13px; color: var(--green); font-weight: 500; margin-top: 6px; }
+.no-statement-note { display: flex; align-items: flex-start; gap: 10px; background: rgba(200,146,42,0.08); border: 1px solid rgba(200,146,42,0.2); border-radius: 10px; padding: 12px 14px; margin-top: 10px; }
+.no-statement-note .ns-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.no-statement-note p { font-size: 13px; color: #7a5a1a; line-height: 1.5; }
+
+/* BUTTONS */
+.btn-primary { width: 100%; padding: 14px; background: var(--navy); color: white; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; border: none; border-radius: var(--radius); cursor: pointer; margin-top: 20px; transition: background 0.15s, transform 0.1s; }
+.btn-primary:hover { background: var(--blue); }
+.btn-primary:active { transform: scale(0.99); }
+.btn-secondary { width: 100%; padding: 12px; background: transparent; color: var(--text-light); font-family: 'DM Sans', sans-serif; font-size: 14px; border: 1.5px solid var(--border); border-radius: var(--radius); cursor: pointer; margin-top: 10px; transition: all 0.15s; }
+.btn-secondary:hover { border-color: var(--blue-light); color: var(--blue); }
+.btn-gold { display: block; width: 100%; padding: 13px; background: var(--gold); color: white; text-align: center; border-radius: var(--radius); font-size: 15px; font-weight: 500; text-decoration: none; margin-top: 14px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; }
+.btn-gold:hover { background: #b8821a; }
+.error-msg { font-size: 13px; color: var(--red); margin-top: 10px; display: none; }
+.api-banner { background: #fffbf0; border: 1px solid rgba(200,146,42,0.25); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 20px; font-size: 13px; color: #7a5a1a; }
+.api-banner strong { display: block; margin-bottom: 6px; }
+.api-banner a { color: var(--gold); }
+.api-banner input { margin-top: 6px; font-family: monospace; font-size: 13px; background: white; }
+
+/* ANALYZING */
+#analyzingScreen { display: none; padding: 56px 24px; text-align: center; }
+.spinner { width: 42px; height: 42px; border: 3px solid var(--cream-dark); border-top-color: var(--navy); border-radius: 50%; animation: spin 0.75s linear infinite; margin: 0 auto 18px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+#analyzingScreen h2 { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 8px; }
+#analyzingScreen p { font-size: 14px; color: var(--text-light); max-width: 340px; margin: 0 auto; }
+.analyzing-steps { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; max-width: 280px; margin-left: auto; margin-right: auto; }
+.analyzing-step { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-light); opacity: 0; animation: fadeIn 0.4s forwards; }
+.analyzing-step .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cream-dark); flex-shrink: 0; }
+.analyzing-step.active .dot { background: var(--gold); }
+.analyzing-step.done .dot { background: var(--green); }
+@keyframes fadeIn { to { opacity: 1; } }
+
+/* RESULTS */
+#resultScreen { display: none; }
+.result-hero { background: var(--navy); padding: 32px 24px; text-align: center; color: white; }
+.result-tag { display: inline-block; font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; }
+.tag-smb { background: rgba(26,110,74,0.3); color: #6ee7b7; border: 1px solid rgba(110,231,183,0.2); }
+.tag-isv { background: rgba(26,74,138,0.4); color: #93c5fd; border: 1px solid rgba(147,197,253,0.2); }
+.tag-nofit { background: rgba(200,146,42,0.25); color: var(--gold-light); border: 1px solid rgba(200,146,42,0.3); }
+.tag-good { background: rgba(26,110,74,0.3); color: #6ee7b7; border: 1px solid rgba(110,231,183,0.2); }
+.savings-range { font-family: 'DM Serif Display', serif; font-size: 48px; color: var(--gold-light); line-height: 1; margin: 10px 0 4px; }
+.savings-sub { font-size: 13px; color: rgba(255,255,255,0.55); font-weight: 300; }
+.effective-rate-callout { display: inline-block; margin-top: 12px; background: rgba(232,75,74,0.2); border: 1px solid rgba(232,75,74,0.3); border-radius: 8px; padding: 7px 14px; font-size: 12px; color: #fca5a5; }
+.result-body { padding: 22px 24px; }
+
+/* PAIN POINT SECTION */
+.pain-solutions { margin: 20px 0; }
+.pain-solutions-title { font-size: 13px; font-weight: 500; color: var(--text-mid); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+.pain-solution-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; background: var(--cream); border-radius: 10px; margin-bottom: 8px; border-left: 3px solid var(--gold); }
+.pain-solution-item .ps-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.pain-solution-item .ps-content { flex: 1; }
+.pain-solution-item .ps-title { font-size: 13px; font-weight: 500; color: var(--text-dark); margin-bottom: 2px; }
+.pain-solution-item .ps-desc { font-size: 12px; color: var(--text-light); line-height: 1.5; }
+
+/* PROBING QUESTIONS */
+.probing-section { background: rgba(26,74,138,0.04); border: 1px solid rgba(26,74,138,0.15); border-radius: var(--radius); padding: 16px 18px; margin: 16px 0; }
+.probing-section h4 { font-size: 14px; font-weight: 500; color: var(--text-dark); margin-bottom: 10px; }
+.probing-q { font-size: 13px; color: var(--text-mid); padding: 6px 0; border-bottom: 0.5px solid var(--border); line-height: 1.5; }
+.probing-q:last-child { border-bottom: none; }
+
+/* TABLES */
+.breakdown-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+.breakdown-table th { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-light); text-align: left; padding: 0 0 10px; border-bottom: 1px solid var(--border); }
+.breakdown-table th:last-child { text-align: right; }
+.breakdown-table td { padding: 11px 0; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: top; }
+.breakdown-table tr:last-child td { border-bottom: none; }
+.fee-name { font-weight: 500; color: var(--text-dark); font-size: 14px; }
+.fee-detail { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+.saving-amount { text-align: right; font-weight: 500; color: var(--green); white-space: nowrap; font-size: 14px; }
+.overpay-badge { display: inline-block; background: var(--red-light); color: var(--red); font-size: 11px; padding: 2px 7px; border-radius: 6px; margin-top: 3px; }
+.pricing-rec { background: var(--cream); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 16px; border-left: 3px solid var(--gold); }
+.pricing-rec h4 { font-size: 11px; font-weight: 500; color: var(--text-light); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+.pricing-rec p { font-size: 14px; color: var(--text-dark); }
+
+/* CARDS */
+.next-steps-card { background: var(--navy); border-radius: var(--radius); padding: 20px; color: white; margin-top: 8px; }
+.next-steps-card h3 { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 10px; }
+.next-steps-card p { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.7; margin-bottom: 8px; }
+.derek { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); }
+.derek-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 14px; color: var(--navy); flex-shrink: 0; }
+.derek-name { font-size: 14px; font-weight: 500; }
+.derek-title { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.4; }
+.fusion-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
+.fusion-stat { background: rgba(255,255,255,0.07); border-radius: 8px; padding: 10px; text-align: center; }
+.fusion-stat .fn { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--gold-light); }
+.fusion-stat .fl { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.nofit-req-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 14px; border-radius: 10px; margin-bottom: 8px; font-size: 13px; }
+.nofit-req-item.failed { background: var(--red-light); }
+.nofit-req-item.passed { background: var(--green-light); }
+.req-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.req-text strong { display: block; font-weight: 500; margin-bottom: 2px; font-size: 13px; }
+.req-text span { font-size: 12px; color: var(--text-light); }
+.isv-flag-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(255,255,255,0.06); border-radius: 10px; margin-bottom: 8px; font-size: 14px; color: rgba(255,255,255,0.85); }
+.value-prop-bar { background: var(--green-light); border: 1px solid rgba(26,110,74,0.2); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 20px; }
+.value-prop-bar p { font-size: 13px; color: var(--green); font-weight: 500; }
+.value-prop-bar span { font-weight: 400; color: #2d6b4a; }
+.disclaimer { font-size: 12px; color: var(--text-light); text-align: center; padding: 16px 24px 24px; line-height: 1.6; border-top: 1px solid var(--border); }
+.footer { text-align: center; padding: 28px 16px 40px; font-size: 13px; color: var(--text-light); }
+.footer strong { color: var(--text-mid); }
+.footer a { color: var(--blue-light); text-decoration: none; }
+.footer .ind-note { font-size: 11px; color: var(--text-light); margin-top: 6px; opacity: 0.8; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">✦ Free analysis · No obligation · 2 minutes</div>
+  <h1>Are you <em>overpaying</em> for payment processing?</h1>
+  <p>Upload your merchant statement and get an instant, personalized savings breakdown — completely free.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="num">55,000+</span><span class="lbl">US businesses served</span></div>
+    <div class="hero-stat"><span class="num">$3.9B</span><span class="lbl">Annual card volume</span></div>
+    <div class="hero-stat"><span class="num">26</span><span class="lbl">Industries supported</span></div>
+  </div>
+  <div class="celero-partnership">
+    <div class="dot"></div>
+    <span>Independent analysis by <strong>Derek Evans</strong>, in partnership with <strong>Celero Commerce</strong></span>
+  </div>
+</div>
+
+<div class="container">
+  <div class="progress-wrap">
+    <div class="progress-steps">
+      <div class="p-step active" id="ps1"><div class="p-dot">1</div><div class="p-label">Your business</div></div>
+      <div class="p-line" id="pl1"></div>
+      <div class="p-step" id="ps2"><div class="p-dot">2</div><div class="p-label">Your statement</div></div>
+      <div class="p-line" id="pl2"></div>
+      <div class="p-step" id="ps3"><div class="p-dot">3</div><div class="p-label">Your results</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+
+      <!-- API key now stored securely in Cloudflare Worker -->
+
+      <!-- STEP 1 -->
+      <div class="step-panel active" id="step1">
+        <div class="step-header">
+          <h2>Tell us about your business</h2>
+          <p>Just the basics to get started.</p>
+        </div>
+        <div class="row2">
+          <div class="field-group"><label>First name <span class="req">*</span></label><input type="text" id="fname" placeholder="Jane" /></div>
+          <div class="field-group"><label>Last name <span class="req">*</span></label><input type="text" id="lname" placeholder="Smith" /></div>
+        </div>
+        <div class="field-group"><label>Email address <span class="req">*</span></label><input type="email" id="email" placeholder="jane@yourbusiness.com" /></div>
+        <div class="row2">
+          <div class="field-group">
+            <label>Industry <span class="req">*</span></label>
+            <select id="industry" onchange="handleIndustryChange(this.value)">
+              <option value="">Select industry...</option>
+              <option value="restaurant">Restaurant / Food Service</option>
+              <option value="retail">Retail</option>
+              <option value="healthcare">Healthcare / Medical</option>
+              <option value="salon">Salon / Spa / Beauty</option>
+              <option value="automotive">Automotive</option>
+              <option value="ecommerce">E-commerce</option>
+              <option value="hotel">Hotel / Hospitality</option>
+              <option value="professional">Professional Services</option>
+              <option value="nonprofit">Non-Profit</option>
+              <option value="isv">Software Platform / ISV</option>
+              <option value="other">Other</option>
+            </select>
+            <div class="isv-qualifier" id="isvQualifier">
+              <div class="isv-qualifier-title">A few quick questions to find you the right solution:</div>
+              <div class="isv-q">
+                <div class="q-text">Does your software serve merchants who then serve their own customers (cardholders)?</div>
+                <label><input type="radio" name="isv_tiers" value="yes"> Yes</label>
+                <label><input type="radio" name="isv_tiers" value="no"> No</label>
+              </div>
+              <div class="isv-q">
+                <div class="q-text">Is your software proprietary and owned by your company?</div>
+                <label><input type="radio" name="isv_own" value="yes"> Yes</label>
+                <label><input type="radio" name="isv_own" value="no"> No</label>
+              </div>
+              <div class="isv-q">
+                <div class="q-text">Do you have US-based merchants using your platform?</div>
+                <label><input type="radio" name="isv_us" value="yes"> Yes</label>
+                <label><input type="radio" name="isv_us" value="no"> No / Not yet</label>
+              </div>
+            </div>
+          </div>
+          <div class="field-group">
+            <label>Monthly processing volume <span class="req">*</span></label>
+            <select id="volume">
+              <option value="">Select range...</option>
+              <option value="under10k">Under $10,000/mo</option>
+              <option value="10k-50k">$10,000 – $50,000/mo</option>
+              <option value="50k-150k">$50,000 – $150,000/mo</option>
+              <option value="150k-500k">$150,000 – $500,000/mo</option>
+              <option value="500k-1m">$500,000 – $1M/mo</option>
+              <option value="over1m">Over $1M/mo</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-group"><label>Current payment processor <span class="opt">(optional)</span></label><input type="text" id="currentProcessor" placeholder="e.g. Square, Stripe, Heartland, First Data..." /></div>
+        <p class="error-msg" id="errorStep1">Please fill in all required fields.</p>
+        <button class="btn-primary" onclick="goToStep2()">Continue →</button>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step-panel" id="step2">
+        <div class="step-header">
+          <h2>Upload your statement</h2>
+          <p>The more detail you share, the more accurate your savings estimate.</p>
+        </div>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+          <div class="upload-icon" id="uploadIcon">📄</div>
+          <h3 id="uploadTitle">Click to upload your merchant statement</h3>
+          <p id="uploadSub">PDF, JPG, or PNG · Your data is kept strictly confidential</p>
+          <div class="file-name" id="fileName"></div>
+        </div>
+        <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFile(this)" />
+        <div class="no-statement-note">
+          <div class="ns-icon">💡</div>
+          <p><strong>Don't have your statement handy? No problem.</strong> Skip the upload and submit anyway — Derek will still give you a ballpark estimate based on your industry and volume. When you track it down, he can do a full line-by-line review within 2 business days.</p>
+        </div>
+        <div style="margin-top:22px;">
+          <div class="step-header" style="margin-bottom:14px;">
+            <h2 style="font-size:18px;">What's frustrating you?</h2>
+            <p>Check everything that applies — this helps personalize your results.</p>
+          </div>
+          <div class="pain-grid">
+            <label class="pain-item"><input type="checkbox" value="high_fees" onchange="togglePain(this)"> High processing fees</label>
+            <label class="pain-item"><input type="checkbox" value="slow_funding" onchange="togglePain(this)"> Slow funding / deposits</label>
+            <label class="pain-item"><input type="checkbox" value="poor_support" onchange="togglePain(this)"> Poor customer support</label>
+            <label class="pain-item"><input type="checkbox" value="clunky_tech" onchange="togglePain(this)"> Clunky / outdated tech</label>
+            <label class="pain-item"><input type="checkbox" value="hidden_fees" onchange="togglePain(this)"> Hidden or surprise fees</label>
+            <label class="pain-item"><input type="checkbox" value="bad_integration" onchange="togglePain(this)"> Poor software integration</label>
+            <label class="pain-item"><input type="checkbox" value="chargebacks" onchange="togglePain(this)"> Chargeback headaches</label>
+            <label class="pain-item"><input type="checkbox" value="pci" onchange="togglePain(this)"> PCI compliance confusion</label>
+          </div>
+          <div class="field-group">
+            <label>Anything else you'd like us to know? <span class="opt">(optional)</span></label>
+            <textarea id="otherNotes" placeholder="Tell us more about your situation, frustrations, or goals..."></textarea>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="submitForm()">Show Me My Results →</button>
+        <button class="btn-secondary" onclick="goToStep1()">← Back</button>
+      </div>
+
+      <!-- ANALYZING -->
+      <div id="analyzingScreen">
+        <div class="spinner"></div>
+        <h2>Analyzing your information...</h2>
+        <p>We're reviewing your details against current processing benchmarks.</p>
+        <div class="analyzing-steps">
+          <div class="analyzing-step active" id="as1" style="animation-delay:0s"><div class="dot"></div>Reading your statement</div>
+          <div class="analyzing-step" id="as2" style="animation-delay:0.7s"><div class="dot"></div>Identifying fee categories</div>
+          <div class="analyzing-step" id="as3" style="animation-delay:1.4s"><div class="dot"></div>Calculating your effective rate</div>
+          <div class="analyzing-step" id="as4" style="animation-delay:2.1s"><div class="dot"></div>Building your results</div>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div id="resultScreen"></div>
+
+      <!-- CONTACT STEP (SMB only) -->
+      <div id="contactStep" style="display:none;">
+        <div style="border-top:1px solid var(--border); padding: 22px 0 4px;">
+          <div class="value-prop-bar">
+            <p>Want Derek to reach out personally? <span>Add your details and he'll be in touch within 1 business day.</span></p>
+          </div>
+          <div class="field-group"><label>Business name <span class="opt">(optional)</span></label><input type="text" id="bizname" placeholder="Smith's Restaurant Group" /></div>
+          <div class="row2">
+            <div class="field-group"><label>Phone number <span class="opt">(optional)</span></label><input type="tel" id="phone" placeholder="(555) 867-5309" /></div>
+            <div class="field-group">
+              <label>Best time to reach you <span class="opt">(optional)</span></label>
+              <select id="bestTime">
+                <option value="">No preference</option>
+                <option value="morning">Morning (8am–12pm)</option>
+                <option value="afternoon">Afternoon (12pm–5pm)</option>
+                <option value="evening">Evening (5pm–7pm)</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="submitContact()" style="margin-top:8px;">Send My Info to Derek →</button>
+          <button class="btn-secondary" onclick="skipContact()">No thanks — I'll reach out when I'm ready</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <strong>Derek Evans</strong> · Independent Payment Consultant<br>
+  <a href="mailto:derek.evans@gocelero.com">derek.evans@gocelero.com</a> ·
+  <a href="https://celerocommerce.com" target="_blank">celerocommerce.com</a>
+  <div class="ind-note">Derek Evans is an independent payment consultant, not an employee of Celero Commerce.<br>This analysis is provided independently in partnership with Celero Commerce.</div>
+</div>
+
+<script>
+/* ── CONFIG ── */
+const MAKE_WEBHOOK_URL = 'https://hook.us2.make.com/3aq6tldz3rdwtf7efwstgqwqyrgrmatf';
+const CALENDLY_URL = 'https://calendly.com/derek-evans-gocelero/30min';
+const LINKEDIN_URL = 'https://www.linkedin.com/in/derekcevans8/';
+const NOTIFY_EMAIL = 'derek.evans@gocelero.com';
+const FUSION_TO = 'ryant@celerocommerce.com';
+const FUSION_CC = 'tommya@celerocommerce.com';
+const LOW_SAVINGS_THRESHOLD = 300;
+
+/* ── RISK FLAGS ── */
+const HIGH_RISK = ['gun','firearm','ammo','ammunition','weapon','adult','xxx','cannabis','marijuana','weed','dispensary','gambling','casino','betting','poker','payday','loan shark','debt collect','crypto','bail bond','nutraceutical','vape','tobacco','escort'];
+const MED_RISK = ['pawn','liquor','alcohol','bar','nightclub','travel','timeshare','mlm','network market','moving','auction'];
+function getRiskFlag(industry, bizname, notes, processor) {
+  const txt = `${industry} ${bizname} ${notes} ${processor}`.toLowerCase();
+  for (const kw of HIGH_RISK) { if (txt.includes(kw)) return { flag:'🔴 Caution', reason:`Potential prohibited vertical: "${kw}" — verify before proceeding` }; }
+  for (const kw of MED_RISK) { if (txt.includes(kw)) return { flag:'🟡 Review', reason:`Borderline industry: "${kw}" — check their site before referring` }; }
+  return { flag:'🟢 Clear', reason:'No risk flags detected' };
+}
+
+/* ── PAIN POINT → SOLUTION MAP ── */
+const PAIN_SOLUTIONS = {
+  slow_funding: { icon:'⚡', title:'Slow funding / deposits', solution:'Celero offers next-day funding on the TSYS platform — your money hits your account the next business day, not 2–3 days later. Real cash flow, not just savings on paper.' },
+  poor_support: { icon:'🤝', title:'Poor customer support', solution:'Celero\'s model is "high-tech, high-touch" — you get a real person, not a call center ticket. Dedicated support that actually picks up.' },
+  clunky_tech: { icon:'💻', title:'Outdated technology', solution:'Celero offers modern hardware (Clover, Dejavoo P Series, PAX A920) and software tools (SwipeSimple for mobile) that actually work the way your business does.' },
+  hidden_fees: { icon:'🔍', title:'Hidden or surprise fees', solution:'Interchange Plus pricing means every fee is visible on your statement — no non-qualified surcharges, no mystery line items. What you see is what you pay.' },
+  bad_integration: { icon:'🔗', title:'Poor software integration', solution:'Celero Connect gateway integrates with most third-party platforms. For healthcare, Practice Management Bridge connects directly to your practice system. Biller Genie handles recurring billing automatically.' },
+  chargebacks: { icon:'🛡️', title:'Chargeback headaches', solution:'Celero has built-in chargeback management tools and retrieval support. You\'ll have visibility and a process — not just surprise deductions.' },
+  pci: { icon:'🔒', title:'PCI compliance confusion', solution:'Celero handles PCI compliance at $6.50/month. No more guessing whether you\'re compliant — it\'s managed for you.' },
+  high_fees: { icon:'💰', title:'High processing fees', solution:'This is exactly what the analysis above addresses. The numbers speak for themselves.' }
+};
+
+/* ── PROBING QUESTIONS BY PAIN POINT ── */
+const PROBING_QUESTIONS = {
+  slow_funding: 'How many days does it currently take for your deposits to hit your account?',
+  poor_support: 'When you\'ve had an issue, what\'s been the most frustrating part of dealing with your current processor\'s support?',
+  clunky_tech: 'What does your current checkout setup look like — terminal, tablet, mobile, or something else?',
+  hidden_fees: 'Have you ever been surprised by a charge on your statement you didn\'t recognize?',
+  bad_integration: 'What software or tools does your business use that you wish talked to your payment system better?',
+  chargebacks: 'How many chargebacks are you dealing with on average per month, and how are you currently managing them?',
+  pci: 'Have you ever gone through a PCI compliance assessment, or has it just been an ongoing fee you\'ve been paying?'
+};
+
+/* ── STATE ── */
+let uploadedFileB64 = null, uploadedFileType = null, currentAnalysis = null, formData = {};
+const hasStatement = () => !!uploadedFileB64;
+
+/* ── HELPERS ── */
+function handleIndustryChange(val) {
+  document.getElementById('isvQualifier').style.display = val === 'isv' ? 'block' : 'none';
+}
+
+function getISVStatus() {
+  const industry = document.getElementById('industry').value;
+  if (industry !== 'isv') return { isISV:false, qualified:false, noFit:false };
+  const tiers = document.querySelector('input[name="isv_tiers"]:checked')?.value;
+  const own = document.querySelector('input[name="isv_own"]:checked')?.value;
+  const us = document.querySelector('input[name="isv_us"]:checked')?.value;
+  const qualified = tiers==='yes' && own==='yes' && us==='yes';
+  const noFit = tiers==='no' || own==='no' || us==='no';
+  return { isISV:true, qualified, noFit, tiers, own, us };
+}
+
+function togglePain(cb) { cb.closest('.pain-item').classList.toggle('checked', cb.checked); }
+function getCheckedPains() { return Array.from(document.querySelectorAll('.pain-item input:checked')).map(c=>c.value); }
+
+function handleFile(input) {
+  const file = input.files[0]; if (!file) return;
+  document.getElementById('uploadIcon').textContent = '✅';
+  document.getElementById('uploadTitle').textContent = 'Statement uploaded';
+  document.getElementById('uploadSub').textContent = 'Your file is ready for analysis';
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('uploadZone').classList.add('has-file');
+  const reader = new FileReader();
+  reader.onload = e => { uploadedFileB64 = e.target.result.split(',')[1]; uploadedFileType = file.type; };
+  reader.readAsDataURL(file);
+}
+
+function buildPainSolutionsHTML(pains, isDark) {
+  if (!pains || pains.length === 0) return '';
+  const relevantPains = pains.filter(p => p !== 'high_fees' && PAIN_SOLUTIONS[p]);
+  if (relevantPains.length === 0) return '';
+  const bgColor = isDark ? 'rgba(255,255,255,0.06)' : 'var(--cream)';
+  const borderColor = isDark ? 'rgba(200,146,42,0.4)' : 'var(--gold)';
+  const titleColor = isDark ? 'rgba(255,255,255,0.5)' : 'var(--text-mid)';
+  const textColor = isDark ? 'rgba(255,255,255,0.9)' : 'var(--text-dark)';
+  const subColor = isDark ? 'rgba(255,255,255,0.6)' : 'var(--text-light)';
+  let html = `<div style="margin:20px 0;"><p style="font-size:13px;font-weight:500;color:${titleColor};text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;">Beyond the numbers — here's what else we can fix</p>`;
+  for (const pain of relevantPains) {
+    const s = PAIN_SOLUTIONS[pain];
+    html += `<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:${bgColor};border-radius:10px;margin-bottom:8px;border-left:3px solid ${borderColor};">
+      <span style="font-size:18px;flex-shrink:0;margin-top:1px;">${s.icon}</span>
+      <div><div style="font-size:13px;font-weight:500;color:${textColor};margin-bottom:2px;">${s.title}</div>
+      <div style="font-size:12px;color:${subColor};line-height:1.5;">${s.solution}</div></div></div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function buildProbingQuestionsHTML(pains) {
+  const relevantPains = (pains || []).filter(p => p !== 'high_fees' && PROBING_QUESTIONS[p]);
+  if (relevantPains.length === 0) return '';
+  let html = `<div style="background:rgba(26,74,138,0.04);border:1px solid rgba(26,74,138,0.15);border-radius:var(--radius);padding:16px 18px;margin:16px 0;">
+    <h4 style="font-size:14px;font-weight:500;color:var(--text-dark);margin-bottom:10px;">A few questions to help me understand your situation better:</h4>`;
+  for (const pain of relevantPains) {
+    html += `<div style="font-size:13px;color:var(--text-mid);padding:7px 0;border-bottom:0.5px solid var(--border);line-height:1.5;">→ ${PROBING_QUESTIONS[pain]}</div>`;
+  }
+  html += `<p style="font-size:12px;color:var(--text-light);margin-top:10px;">Check your inbox — Derek's email is on its way. Reply with your answers, or grab time on his calendar below.</p></div>`;
+  return html;
+}
+
+/* ── PROGRESS ── */
+function updateProgress(step) {
+  for (let i=1; i<=3; i++) {
+    const ps = document.getElementById('ps'+i);
+    ps.classList.remove('active','done');
+    if (i<step) ps.classList.add('done'); else if (i===step) ps.classList.add('active');
+    if (i<3) document.getElementById('pl'+i).classList.toggle('done', i<step);
+  }
+}
+
+function goToStep1() {
+  document.getElementById('step2').classList.remove('active');
+  document.getElementById('step1').classList.add('active');
+  updateProgress(1);
+}
+
+function goToStep2() {
+  const fname=document.getElementById('fname').value.trim(), lname=document.getElementById('lname').value.trim();
+  const email=document.getElementById('email').value.trim(), industry=document.getElementById('industry').value;
+  const volume=document.getElementById('volume').value, err=document.getElementById('errorStep1');
+  if (!fname||!lname||!email||!industry||!volume) { err.style.display='block'; return; }
+  err.style.display='none';
+  document.getElementById('step1').classList.remove('active');
+  document.getElementById('step2').classList.add('active');
+  updateProgress(2); try { document.querySelector('.progress-wrap').scrollIntoView({behavior:'smooth', block:'start'}); } catch(e) { window.scrollTo({top:0,behavior:'smooth'}); }
+}
+
+/* ── SUBMIT ── */
+async function submitForm() {
+  const fname=document.getElementById('fname').value.trim(), lname=document.getElementById('lname').value.trim();
+  const email=document.getElementById('email').value.trim(), industry=document.getElementById('industry').value;
+  const volume=document.getElementById('volume').value, processor=document.getElementById('currentProcessor').value.trim();
+  const notes=document.getElementById('otherNotes').value.trim(), pains=getCheckedPains();
+  const isvStatus=getISVStatus(), statementUploaded=hasStatement();
+  formData={fname,lname,email,industry,volume,processor,notes,pains,isvStatus,statementUploaded};
+  document.getElementById('step2').classList.remove('active');
+  document.getElementById('analyzingScreen').style.display='block';
+  animateSteps(); updateProgress(3);
+  try {
+    console.log('Starting AI analysis...');
+    const a=await runAIAnalysis(fname,lname,email,processor,pains,notes,volume,industry,isvStatus,statementUploaded);
+    console.log("AI result type:", a.prospect_type, "effective_rate:", a.effective_rate);
+    showResults(a,isvStatus,statementUploaded,pains);
+    sendToMake(fname,lname,"",email,"",processor,pains,notes,volume,industry,isvStatus,a,statementUploaded,"","");
+  } catch(e) {
+    console.error("AI FAILED:", e.message);
+    document.getElementById("analyzingScreen").insertAdjacentHTML("beforeend", `<div style="margin-top:16px;padding:12px;background:#fdf0ee;border:1px solid #c0392b;border-radius:8px;font-size:13px;color:#8b2a1a;text-align:left;">API Error: ${e.message} — using estimates instead.</div>`);
+    await new Promise(r=>setTimeout(r,2000));
+    const m=buildMockAnalysis(fname,"",email,"",processor,pains,industry,volume,isvStatus,statementUploaded);
+    showResults(m,isvStatus,statementUploaded,pains);
+    sendToMake(fname,lname,"",email,"",processor,pains,notes,volume,industry,isvStatus,m,statementUploaded,"","");
+  }
+}
+
+function showResults(analysis, isvStatus, statementUploaded, pains) {
+  currentAnalysis=analysis;
+  document.getElementById('analyzingScreen').style.display='none';
+  renderResult(formData,isvStatus,analysis,statementUploaded,pains||formData.pains||[]);
+  if (!isvStatus.isISV) document.getElementById('contactStep').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function animateSteps() {
+  ['as1','as2','as3','as4'].forEach((id,i)=>{
+    setTimeout(()=>{ if(i>0) document.getElementById(['as1','as2','as3','as4'][i-1]).classList.add('done'); document.getElementById(id).classList.add('active'); },i*900);
+  });
+}
+
+function submitContact() {
+  const bizname=document.getElementById('bizname').value.trim(), phone=document.getElementById('phone').value.trim(), bestTime=document.getElementById('bestTime').value;
+  const {fname,lname,email,industry,volume,processor,pains,notes,isvStatus,statementUploaded}=formData;
+  sendToMake(fname,lname,bizname,email,phone,processor,pains,notes,volume,industry,isvStatus,currentAnalysis,statementUploaded,bestTime,'yes');
+  document.getElementById('contactStep').innerHTML=`<div style="padding:20px 0;text-align:center;"><p style="font-size:15px;color:var(--green);font-weight:500;">✓ Got it — Derek will be in touch within 1 business day.</p></div>`;
+}
+function skipContact() { document.getElementById('contactStep').style.display='none'; }
+
+/* ── DUAL PRICING ELIGIBLE INDUSTRIES ── */
+function isDualPricingEligible(industry, bizname, notes, processor) {
+  const eligible = ['restaurant','retail','salon','automotive'];
+  if (!eligible.includes(industry)) return false;
+  const txt = `${bizname||''} ${notes||''} ${processor||''}`.toLowerCase();
+  const carwashKw = ['car wash','carwash','auto wash','autowash','car detail','detail','express wash','wash'];
+  if (industry==='automotive' && carwashKw.some(kw => txt.includes(kw))) return false;
+  return true;
+}
+
+/* ── AI ANALYSIS ── */
+async function runAIAnalysis(fname,lname,email,processor,pains,notes,volume,industry,isvStatus,statementUploaded) {
+  const isISV=isvStatus.qualified, isNoFit=isvStatus.noFit;
+  const dualPricing = isDualPricingEligible(industry, fname, notes, processor);
+
+  const sys=`You are a payment fee analyst for Derek Evans, independent payment consultant partnered with Celero Commerce ("High-tech, high-touch payment solutions").
+
+Celero Schedule E buy rates (Derek's absolute cost floor — he marks up above these):
+- Auth/Capture: $0.035/txn | Pin Debit: $0.055/txn | AVS: $0.01/txn
+- Batch: $0.05/batch | Chargeback: $10.00 | Retrieval: $6.00 | ACH Reject: $15.00
+- Account on File + statement: $5.50/mo | Annual Fee: $25/yr
+- PCI Compliance: $6.50/mo | PCI Non-Compliance: $39.99/mo | Security Bundle: $20/mo
+
+═══ STEP 1: EXTRACT FROM STATEMENT ═══
+Find and record these EXACT numbers:
+A) TOTAL FEES: Find the "TOTAL CHARGE TO YOUR ACCOUNT" or "TOTAL" summary line — this is ALL fees combined. Do NOT use card subtotals alone.
+B) TOTAL VOLUME: Net sales from card type summary table.
+C) TRANSACTION COUNT: Total number of transactions.
+D) AVG TICKET: Volume ÷ Transaction count.
+E) HEADLINE RATE: (Visa+MC+Amex+Discover card fee subtotals only) ÷ Volume × 100
+F) TRUE ALL-IN RATE: Total Fees (A) ÷ Volume (B) × 100
+G) RATE GAP: F minus E — this is auth fees + network fees + monthly fees the merchant doesn't realize they're paying
+
+EXAMPLE: Volume $18,925 · Total fees $929.95 · True rate 4.91% · Card subtotals $589 · Headline rate 3.11% · Gap 1.80%
+NEVER calculate rate from individual interchange category rows.
+
+═══ STEP 2: CLASSIFY THE DEAL ═══
+if true_rate >= 0.04: deal_type = "high_overpay"
+if true_rate >= 0.025 and < 0.04: deal_type = "average"
+if true_rate < 0.025: deal_type = "optimized" → use smb_low_savings
+
+═══ STEP 3: ASSIGN DEREK'S PRICING (his sell rates, above Schedule E) ═══
+high_overpay + avg_ticket >= $25: markup=0.80%, txn_fee=$0.10
+high_overpay + avg_ticket < $25: markup=0.60%, txn_fee=$0.08 (small ticket — per-txn fees dominate)
+average: markup=0.60%, txn_fee=$0.08
+optimized: → smb_low_savings, no savings pitch
+
+═══ STEP 4: CALCULATE SAVINGS ═══
+estimated_interchange = 0.019 (1.9% — typical blended rate)
+new_effective_rate = estimated_interchange + markup + (transactions/volume × txn_fee)
+savings_rate = true_rate - new_effective_rate
+monthly_savings_raw = volume × savings_rate
+displayed_monthly_savings = monthly_savings_raw × 0.78 (show 78% — honest, leaves room to overdeliver)
+annual_savings_low = displayed_monthly_savings × 12 × 0.85
+annual_savings_high = displayed_monthly_savings × 12 × 1.10
+
+IMPORTANT: annual_savings_low and annual_savings_high must match the fee_breakdown totals. Make fee_breakdown comprehensive so it explains the full savings range.
+
+═══ STEP 5: YOUR INCOME (include in JSON for Derek's records, NOT shown to prospect) ═══
+bp_revenue = volume × markup
+txn_revenue = transactions × txn_fee
+gross_margin = bp_revenue + txn_revenue
+derek_monthly_income = gross_margin × 0.70
+
+${isISV?`═══ ISV QUALIFIED ═══
+Do NOT give savings amounts. List fee CATEGORIES likely overpaying (no dollar amounts).
+Pitch Celero Fusion: 4,700+ merchants, $3.9B annual card volume, 19-day avg implementation, 26 verticals. Built by software professionals for software professionals.`:isNoFit?`═══ ISV NOT QUALIFIED ═══
+Explain which Fusion requirements they failed kindly. Offer to resubmit.`:`═══ SMB SAVINGS ═══
+Use the framework above. If annual_savings_high < $300, use smb_low_savings.
+Show clear before/after: their current rate vs estimated new rate with Celero.
+Use urgency: "you're likely overpaying by $X/month — $Y/year."
+${dualPricing?`DUAL PRICING NOTE: This merchant's industry qualifies for Dual Pricing. Set dual_pricing_eligible: true. Do NOT include Dual Pricing as a line item in fee_breakdown.`:`DUAL PRICING: Set dual_pricing_eligible: false. Do NOT mention dual pricing anywhere.`}
+CAR WASH RULE: If the business name, industry notes, or statement header contains "car wash", "carwash", "auto wash", or similar — set dual_pricing_eligible: false regardless of industry. Car washes run almost entirely on cards so dual pricing doesn't apply.
+FEE BREAKDOWN RULE: Only include actual fee line items in fee_breakdown (auth fees, monthly fees, PCI fees, etc.). Never include Dual Pricing, technology upgrades, or non-fee items as breakdown rows. The sum of annual_saving values in fee_breakdown should roughly equal annual_savings_high.
+PROSPECT MESSAGE RULE: Keep prospect_message to 2-3 SHORT sentences maximum. State their current rate, the gap or opportunity in plain terms, and one clear call to action. No more than 60 words total. Conversational, not salesy.
+${!statementUploaded?'NO STATEMENT: Estimate from industry/volume typical rates. Be honest this is a ballpark.':''}`}
+
+Respond ONLY in valid JSON, no markdown, no backticks:
+{
+  "prospect_type": "smb_statement|smb_no_statement|smb_low_savings|isv_statement|isv_no_statement|nofit",
+  "deal_type": "high_overpay|average|optimized|isv|nofit",
+  "total_fees_found": number,
+  "total_volume_found": number,
+  "transaction_count": number,
+  "avg_ticket": number,
+  "effective_rate": number,
+  "headline_rate": number,
+  "rate_gap": number,
+  "effective_rate_flag": boolean,
+  "new_effective_rate_estimated": number,
+  "derek_monthly_income_estimate": number,
+  "annual_savings_low": number,
+  "annual_savings_high": number,
+  "dual_pricing_eligible": boolean,
+  "fee_breakdown": [{"fee_name":"string","current_amount":"string","celero_amount":"string","annual_saving":number,"severity":"high|medium|low","note":"string"}],
+  "isv_overpayment_categories": ["string"],
+  "red_flags": ["string"],
+  "top_insight": "string",
+  "summary": "string",
+  "prospect_message": "string",
+  "fusion_intro_email": "string"
+}`;
+
+  let content=[];
+  if (uploadedFileB64) { if(uploadedFileType==='application/pdf') content.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:uploadedFileB64}}); else content.push({type:'image',source:{type:'base64',media_type:uploadedFileType,data:uploadedFileB64}}); }
+  content.push({type:'text',text:`Merchant: ${fname} ${lname}\nIndustry: ${industry} | Volume bracket: ${volume}\nProcessor: ${processor||'not provided'}\nPain points: ${pains.join(', ')||'none'}\nNotes: ${notes||'none'}\nDual pricing eligible industry: ${dualPricing}\nStatement: ${statementUploaded?'YES — analyze it fully, extract all numbers':'NO — estimate from industry/volume typical rates'}`});
+  const resp = await fetch('https://celero-proxy.derekcevans8.workers.dev', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:2200, system:sys, messages:[{ role:'user', content }] })
+  });
+  const data=await resp.json();
+  const raw=data.content?.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+  return JSON.parse(raw);
+}
+
+/* ── MOCK ANALYSIS ── */
+function buildMockAnalysis(fname,bizname,email,phone,processor,pains,industry,volume,isvStatus,statementUploaded) {
+  const pRec={restaurant:'Dual Pricing — eliminates processing costs entirely',salon:'Dual Pricing — zero-cost processing, clearly disclosed',automotive:'Dual Pricing — removes processing cost from your bottom line',healthcare:'Level 2/3 via Celero Connect',retail:'Interchange Plus — transparent pricing',professional:'Interchange Plus — full transparency'}[industry]||'Interchange Plus — transparent, fair pricing';
+  if (isvStatus.noFit) {
+    const items=[];
+    if(isvStatus.tiers==='no') items.push({req:'Three-tier platform structure',reason:'Fusion requires your software to serve merchants who then serve their own cardholders — ensuring payments are truly embedded in your platform.',passed:false});
+    if(isvStatus.own==='no') items.push({req:'Proprietary software ownership',reason:'Fusion partners must own their software to ensure we\'re working with the actual decision-maker, not a reseller.',passed:false});
+    if(isvStatus.us==='no') items.push({req:'US-based merchants',reason:'Celero Fusion currently onboards US merchants only.',passed:false});
+    if(isvStatus.tiers==='yes') items.push({req:'Three-tier platform structure',reason:'',passed:true});
+    if(isvStatus.own==='yes') items.push({req:'Proprietary software ownership',reason:'',passed:true});
+    if(isvStatus.us==='yes') items.push({req:'US-based merchants',reason:'',passed:true});
+    return {prospect_type:'nofit',failedItems:items,summary:`${fname}, based on your answers your platform doesn't meet all current Celero Fusion requirements. If you answered something incorrectly, go back and resubmit. Otherwise Derek will look into your situation personally.`,fusion_intro_email:'',annual_savings_low:0,annual_savings_high:0,fee_breakdown:[],red_flags:[],top_insight:'',isv_overpayment_categories:[]};
+  }
+  if (isvStatus.qualified) {
+    const type=statementUploaded?'isv_statement':'isv_no_statement';
+    return {prospect_type:type,isv_overpayment_categories:statementUploaded?['Authorization & transaction fees','PCI compliance structure','Monthly maintenance & statement fees','Gateway & tokenization fees']:[],top_insight:'Software platforms like yours are exactly what Celero Fusion was built for.',summary:`${fname}, your platform is a strong match for Celero Fusion — built by software professionals, for software professionals. Fusion gives ISVs full control over pricing, branding, and merchant relationships without the development risk or compliance headaches.`,prospect_message:statementUploaded?`We took a look at your statement and identified areas where your platform is likely leaving money on the table — particularly around transaction fees, compliance structure, and monthly costs. The Fusion team will walk you through exactly what a better setup looks like.`:`Based on what you've shared, you look like a strong Fusion candidate. Keep an eye on your inbox — Derek will be in touch with a personal introduction to our specialist team.`,fusion_intro_email:`Hi Ryan,\n\nWarm introduction to ${fname}${bizname?' at '+bizname:''}. They operate a software platform in the ${industry} space, processing in the ${volume} range, currently with ${processor||'an existing provider'}.\n\nPain points they flagged: ${pains.join(', ')||'none specified'}.\nStatement uploaded: ${statementUploaded?'Yes':'No'}.\n\nThey passed all three Fusion qualification checks and replied to my initial outreach showing genuine interest.\n\nPlease reach out at ${email}${phone?' / '+phone:''}.\n\nThanks,\nDerek Evans\nIndependent Payment Consultant · Celero Commerce Partner\nderek.evans@gocelero.com`,annual_savings_low:0,annual_savings_high:0,fee_breakdown:[],red_flags:[]};
+  }
+  /* Check for low savings scenario */
+  const savingsLow = statementUploaded ? 180 : 120;
+  const savingsHigh = statementUploaded ? 280 : 240;
+  const isLowSavings = !pains.includes('high_fees') && savingsHigh < LOW_SAVINGS_THRESHOLD;
+  if (isLowSavings) {
+    return {prospect_type:'smb_low_savings',effective_rate:statementUploaded?2.1:null,effective_rate_flag:false,annual_savings_low:savingsLow,annual_savings_high:savingsHigh,recommended_pricing_model:pRec,fee_breakdown:[],red_flags:[],top_insight:`${fname}, your current rates are actually pretty competitive — you're not getting gouged on fees.`,summary:`Good news: your effective rate looks healthy compared to industry benchmarks. That said, competitive fees don't mean there aren't other things worth fixing. Based on what you shared, there are still meaningful improvements we can make to your overall payment setup.`,prospect_message:`Sometimes the biggest gains aren't in fees — they're in better tech, support, and cash flow. Happy to share a quick review! Reply here or grab 15 minutes on my calendar.`,fusion_intro_email:''};
+  }
+  const type=statementUploaded?'smb_statement':'smb_no_statement';
+  return {prospect_type:type,effective_rate:statementUploaded?2.66:null,effective_rate_flag:statementUploaded,annual_savings_low:statementUploaded?1800:1200,annual_savings_high:statementUploaded?4200:3600,recommended_pricing_model:pRec,fee_breakdown:statementUploaded?[
+    {fee_name:'PCI Non-Compliance Fee',current_rate:'$79–$99/mo (typical)',celero_rate:'$6.50/mo (compliant)',annual_saving:1116,severity:'high',note:'Most merchants unknowingly pay this. Getting compliant eliminates it entirely.'},
+    {fee_name:'Auth / Capture Fee',current_rate:'$0.10–$0.20/txn (typical)',celero_rate:'$0.035/txn',annual_saving:900,severity:'high',note:'Per-transaction fees add up fast at volume.'},
+    {fee_name:'Monthly Statement Fee',current_rate:'$10–$25/mo (typical)',celero_rate:'$5.50/mo',annual_saving:228,severity:'medium',note:'Charged simply to receive a document. No added value.'}
+  ]:[
+    {fee_name:'PCI & Compliance Fees',current_rate:'Likely $20–$99/mo',celero_rate:'$6.50/mo (compliant)',annual_saving:756,severity:'high',note:'One of the most common overpayments — most merchants are non-compliant and don\'t know it.'},
+    {fee_name:'Authorization Fees',current_rate:'Likely $0.10–$0.20/txn',celero_rate:'$0.035/txn',annual_saving:600,severity:'high',note:'Estimate based on your volume range. Full statement needed for exact figure.'},
+    {fee_name:'Monthly Maintenance Fees',current_rate:'Likely $15–$30/mo',celero_rate:'$5.50/mo',annual_saving:180,severity:'medium',note:'Statement fees, account fees — often bundled and easy to miss.'}
+  ],red_flags:['PCI compliance overpayment likely','High per-transaction fees','Monthly junk fees'],top_insight:statementUploaded?`Based on your statement, you're likely overpaying by $1,800–$4,200 per year — and that's a conservative number.`:`Based on your industry and volume, merchants like you typically overpay by $1,200–$3,600 per year.`,summary:statementUploaded?`${fname}, we went through your statement line by line and found several areas where you're overpaying. The biggest wins are PCI compliance status and inflated authorization fees — both very fixable.`:`${fname}, without your full statement these are ballpark figures. The real number comes from your actual statement — worth 15 minutes to find out.`,prospect_message:statementUploaded?`These numbers come directly from your statement. I'd love to walk you through them on a quick call and show you exactly what switching would look like. I'll do all the heavy lifting.`:`This is an estimate. When you track down your statement, send it over and I'll do a full line-by-line review within 2 business days. No obligation.`,fusion_intro_email:''};
+}
+
+/* ── MAKE WEBHOOK ── */
+async function sendToMake(fname,lname,bizname,email,phone,processor,pains,notes,volume,industry,isvStatus,analysis,statementUploaded,bestTime,contactSubmitted) {
+  if(!MAKE_WEBHOOK_URL||MAKE_WEBHOOK_URL.includes('YOUR_')) return;
+  const rf=getRiskFlag(industry,bizname||'',notes,processor);
+  const payload={
+    first_name:fname,last_name:lname,business_name:bizname||'',email,phone:phone||'',
+    current_processor:processor,industry,monthly_volume:volume,
+    prospect_type:isvStatus.qualified?'ISV — Fusion Referral':isvStatus.noFit?'ISV — Not Qualified':analysis.prospect_type==='smb_low_savings'?'SMB — Low Savings':analysis.prospect_type==='smb_no_statement'?'SMB — No Statement':'SMB — Statement Uploaded',
+    statement_uploaded:statementUploaded?'Yes':'No',
+    statement_file_b64:statementUploaded?uploadedFileB64:'',
+    statement_file_type:statementUploaded?uploadedFileType:'',
+    pain_points:pains.join(', '),additional_notes:notes,
+    effective_rate:analysis.effective_rate||'',effective_rate_flag:analysis.effective_rate_flag?'Yes — above 2.5%':'No',
+    savings_low:analysis.annual_savings_low||0,savings_high:analysis.annual_savings_high||0,
+    recommended_pricing:analysis.recommended_pricing_model||'',
+    red_flags:(analysis.red_flags||[]).join(', '),
+    isv_overpayment_categories:(analysis.isv_overpayment_categories||[]).join(', '),
+    risk_flag:rf.flag,risk_flag_reason:rf.reason,
+    top_insight:analysis.top_insight||'',ai_summary:analysis.summary||'',
+    fusion_intro_email:analysis.fusion_intro_email||'',
+    fusion_to:FUSION_TO,fusion_cc:FUSION_CC,
+    best_time_to_call:bestTime||'',contact_info_submitted:contactSubmitted||'no',
+    notify_email:NOTIFY_EMAIL,calendly_url:CALENDLY_URL,linkedin_url:LINKEDIN_URL,
+    submitted_at:new Date().toISOString()
+  };
+  try { await fetch(MAKE_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); }
+  catch(e) { console.warn('Webhook failed:',e); }
+}
+
+/* ── RENDER RESULTS ── */
+function renderResult(fd,isvStatus,a,statementUploaded,pains) {
+  const screen=document.getElementById('resultScreen');
+  screen.style.display='block';
+  const type=a.prospect_type;
+  const dualEligible=a.dual_pricing_eligible||isDualPricingEligible(fd.industry,fd.fname,fd.notes,fd.processor);
+  let html='';
+
+  function fmtMoney(n){return (n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function fmtRate(n){return n?n.toFixed(2):'?';}
+
+  function statsCard(fees,vol,rate){
+    return `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0;">
+      <div style="background:var(--cream);border-radius:var(--radius);padding:14px;text-align:center;">
+        <div style="font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Your Monthly Fees</div>
+        <div style="font-size:20px;font-weight:500;color:var(--text-dark);">$${fees}</div>
+      </div>
+      <div style="background:var(--cream);border-radius:var(--radius);padding:14px;text-align:center;">
+        <div style="font-size:11px;color:var(--text-light);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Monthly Volume</div>
+        <div style="font-size:20px;font-weight:500;color:var(--text-dark);">$${vol}</div>
+      </div>
+      <div style="background:var(--red-light);border-radius:var(--radius);padding:14px;text-align:center;border:1px solid rgba(139,42,26,0.15);">
+        <div style="font-size:11px;color:var(--red);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">True Eff. Rate</div>
+        <div style="font-size:20px;font-weight:500;color:var(--red);">${rate}%</div>
+      </div>
+    </div>`;
+  }
+
+  function rateCompare(cur,est,gap,headline){
+    if(!cur||!est) return '';
+    return `<div style="background:var(--cream);border-radius:var(--radius);padding:16px 18px;margin:16px 0;">
+      <div style="font-size:11px;font-weight:500;color:var(--text-light);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;">Rate Comparison — Before &amp; After</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:110px;text-align:center;padding:12px;background:var(--red-light);border-radius:10px;">
+          <div style="font-size:11px;color:var(--red);margin-bottom:4px;">Your current rate</div>
+          <div style="font-size:26px;font-weight:500;color:var(--red);">${cur}%</div>
+        </div>
+        <div style="font-size:22px;color:var(--text-light);">→</div>
+        <div style="flex:1;min-width:110px;text-align:center;padding:12px;background:var(--green-light);border-radius:10px;">
+          <div style="font-size:11px;color:var(--green);margin-bottom:4px;">Estimated with Celero</div>
+          <div style="font-size:26px;font-weight:500;color:var(--green);">${est}%</div>
+        </div>
+      </div>
+      ${gap?`<p style="font-size:12px;color:var(--text-light);margin-top:10px;text-align:center;">That ${gap}% gap is real money leaving your account every month${headline?` — most merchants think they pay ${headline}%`:''}.</p>`:''}
+    </div>`;
+  }
+
+  function dualCallout(){
+    return `<div style="background:linear-gradient(135deg,rgba(200,146,42,0.1),rgba(232,184,75,0.08));border:1.5px solid rgba(200,146,42,0.4);border-radius:var(--radius);padding:16px 18px;margin:16px 0;">
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <span style="font-size:22px;flex-shrink:0;">💡</span>
+        <div>
+          <div style="font-size:14px;font-weight:500;color:var(--text-dark);margin-bottom:4px;">Dual Pricing could take your processing costs to near zero</div>
+          <div style="font-size:13px;color:var(--text-mid);line-height:1.6;">Businesses like yours can show a cash price and a card price at checkout — your net cost on card transactions drops to near $0. Ask Derek about this on your call. It could be bigger than the fee savings above.</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function beyondNumbers(pains,isDark){
+    const rel=(pains||[]).filter(p=>p!=='high_fees'&&PAIN_SOLUTIONS[p]);
+    if(!rel.length) return '';
+    const bg=isDark?'rgba(255,255,255,0.06)':'var(--cream)';
+    const bdr=isDark?'rgba(200,146,42,0.4)':'var(--gold)';
+    const hc=isDark?'rgba(255,255,255,0.9)':'var(--text-dark)';
+    const tc=isDark?'rgba(255,255,255,0.85)':'var(--text-mid)';
+    const dc=isDark?'rgba(255,255,255,0.55)':'var(--text-light)';
+    let h=`<div style="margin:20px 0;">
+      <div style="font-size:13px;font-weight:500;color:${hc};letter-spacing:0.03em;margin-bottom:12px;padding-bottom:8px;border-bottom:1.5px solid ${isDark?'rgba(255,255,255,0.1)':'var(--border)'};">BEYOND THE NUMBERS — HERE'S WHAT ELSE WE CAN FIX</div>`;
+    for(const p of rel){
+      const s=PAIN_SOLUTIONS[p];
+      h+=`<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:${bg};border-radius:10px;margin-bottom:8px;border-left:3px solid ${bdr};">
+        <span style="font-size:18px;flex-shrink:0;margin-top:2px;">${s.icon}</span>
+        <div><div style="font-size:13px;font-weight:500;color:${tc};margin-bottom:3px;">${s.title}</div>
+        <div style="font-size:12px;color:${dc};line-height:1.55;">${s.solution}</div></div>
+      </div>`;
+    }
+    return h+'</div>';
+  }
+
+  function nextSteps(msg,showCal){
+    return `<div class="next-steps-card">
+      <p style="font-size:15px;color:rgba(255,255,255,0.85);line-height:1.65;margin-bottom:0;">${msg}</p>
+      ${showCal?`<a href="${CALENDLY_URL}" target="_blank" class="btn-gold" style="margin-top:14px;">📅 Book a free 15-min call — I'll do the math</a>`:''}
+      <div class="derek"><div class="derek-avatar">DE</div>
+      <div><div class="derek-name">Derek Evans</div>
+      <div class="derek-title">Independent Payment Consultant · Celero Commerce Partner<br>derek.evans@gocelero.com</div></div></div>
+    </div>`;
+  }
+
+  /* NO FIT */
+  if(type==='nofit'){
+    html+=`<div class="result-hero"><div class="result-tag tag-nofit">Thanks for reaching out</div>
+    <h2 style="font-size:22px;">We'll find the right fit for you</h2>
+    <p style="color:rgba(255,255,255,0.65);font-size:14px;margin-top:8px;max-width:420px;margin-left:auto;margin-right:auto;">Based on your answers, Celero Fusion may not be the right fit right now.</p></div>
+    <div class="result-body">
+    <p style="font-size:14px;color:var(--text-mid);margin-bottom:16px;line-height:1.7;">Here's how your answers stacked up. Go back and resubmit if you think you made an error.</p>`;
+    if(a.failedItems){for(const item of a.failedItems){html+=`<div class="nofit-req-item ${item.passed?'passed':'failed'}"><div class="req-icon">${item.passed?'✅':'❌'}</div><div class="req-text"><strong>${item.req}</strong>${!item.passed&&item.reason?`<span>${item.reason}</span>`:''}</div></div>`;}}
+    html+=`<p style="font-size:14px;color:var(--text-mid);line-height:1.7;margin-top:12px;">${a.summary}</p>
+    <button class="btn-secondary" onclick="location.reload()" style="margin-top:16px;">← Go back and resubmit</button>
+    ${nextSteps('Derek will review your info and reach out personally to explore options.',false)}
+    </div>`;
+
+  /* ISV */
+  }else if(type==='isv_statement'||type==='isv_no_statement'){
+    html+=`<div class="result-hero"><div class="result-tag tag-isv">Software Platform / ISV</div>
+    <h2>You're a strong fit for Celero Fusion</h2>
+    <p style="color:rgba(255,255,255,0.65);font-size:14px;margin-top:8px;max-width:400px;margin-left:auto;margin-right:auto;">${a.top_insight}</p></div>
+    <div class="result-body">
+    <div style="background:linear-gradient(135deg,#0a1628,#122040);border-radius:var(--radius);padding:24px;color:white;border:1px solid rgba(26,74,138,0.4);">
+    <h3 style="font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:10px;">Built for platforms like yours</h3>
+    <div class="fusion-stats"><div class="fusion-stat"><div class="fn">4,700+</div><div class="fl">Total merchants</div></div><div class="fusion-stat"><div class="fn">$3.9B</div><div class="fl">Annual card volume</div></div><div class="fusion-stat"><div class="fn">19 days</div><div class="fl">Avg. go-live</div></div></div>
+    <p style="font-size:14px;color:rgba(255,255,255,0.75);line-height:1.7;margin-bottom:10px;">${a.summary}</p>`;
+    if(type==='isv_statement'&&a.isv_overpayment_categories?.length){
+      html+=`<p style="font-size:12px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;margin-top:4px;">Areas where you're likely overpaying</p>`;
+      for(const cat of a.isv_overpayment_categories){html+=`<div class="isv-flag-item"><span style="font-size:14px;">⚠️</span>${cat}</div>`;}
+      html+=`<p style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:8px;margin-bottom:14px;">Our Fusion team will walk you through what these mean for your platform's revenue.</p>`;
+    }
+    html+=beyondNumbers(pains,true);
+    html+=`<p style="font-size:14px;color:rgba(255,255,255,0.75);line-height:1.7;margin-bottom:14px;">${a.prospect_message}</p>
+    <div style="background:rgba(200,146,42,0.15);border:1px solid rgba(200,146,42,0.3);border-radius:10px;padding:14px 16px;">
+      <p style="font-size:14px;color:var(--gold-light);font-weight:500;margin-bottom:4px;">📬 Keep an eye on your inbox</p>
+      <p style="font-size:13px;color:rgba(255,255,255,0.65);margin:0;">Derek will personally reach out with an intro to our Celero Fusion specialist team.</p>
+    </div>
+    <div class="derek"><div class="derek-avatar">DE</div><div><div class="derek-name">Derek Evans</div>
+    <div class="derek-title">Independent Payment Consultant · Celero Commerce Partner<br>derek.evans@gocelero.com</div></div></div>
+    </div></div>`;
+
+  /* LOW SAVINGS */
+  }else if(type==='smb_low_savings'){
+    html+=`<div class="result-hero"><div class="result-tag tag-good">Good news</div>
+    <h2>Your rates are actually pretty competitive</h2>
+    ${a.effective_rate?`<div class="effective-rate-callout" style="background:rgba(26,110,74,0.2);border-color:rgba(110,231,183,0.3);color:#6ee7b7;margin-top:10px;">Your effective rate: ~${fmtRate(a.effective_rate)}% — within healthy range</div>`:''}
+    </div>
+    <div class="result-body">`;
+    if(a.total_fees_found&&a.total_volume_found&&a.effective_rate){
+      html+=statsCard(fmtMoney(a.total_fees_found),fmtMoney(a.total_volume_found),fmtRate(a.effective_rate));
+    }
+    html+=`<p style="font-size:15px;color:var(--text-mid);line-height:1.7;margin-bottom:4px;">${a.summary}</p>`;
+    html+=beyondNumbers(pains,false);
+    if(!pains||!pains.length){
+      html+=`<div style="background:var(--cream);border-radius:var(--radius);padding:16px 18px;margin:16px 0;border-left:3px solid var(--gold);"><p style="font-size:14px;color:var(--text-dark);line-height:1.7;">Even when fee savings are modest, there are often other ways to improve your setup — faster funding, better tech, cleaner reporting.</p></div>`;
+    }
+    html+=buildProbingQuestionsHTML(pains);
+    html+=nextSteps(a.prospect_message||'Sometimes the biggest gains aren\'t in fees — they\'re in better tech, support, and cash flow. Happy to take a quick look.',true);
+    html+='</div>';
+
+  /* SMB — STATEMENT OR NO STATEMENT */
+  }else{
+    const low=(a.annual_savings_low||0).toLocaleString();
+    const high=(a.annual_savings_high||0).toLocaleString();
+    const isEst=type==='smb_no_statement';
+    const cr=fmtRate(a.effective_rate);
+    const nr=fmtRate(a.new_effective_rate_estimated);
+    const gap=a.rate_gap?a.rate_gap.toFixed(2):null;
+    const hl=a.headline_rate?a.headline_rate.toFixed(2):null;
+
+    html+=`<div class="result-hero"><div class="result-tag tag-smb">${isEst?'Estimated Savings':'Your Savings Analysis'}</div>
+    <h2>${isEst?'Here\'s your ballpark':'Here\'s what you could save'}</h2>
+    <div class="savings-range">$${low}–$${high}</div>
+    <div class="savings-sub">${isEst?'estimated annual savings · based on your industry & volume':'estimated annual savings · based on your statement'}</div>
+    ${a.effective_rate_flag&&a.effective_rate?`<div class="effective-rate-callout">Your true all-in rate: ~${cr}%${hl&&gap?` · You probably think it\'s ${hl}% — the ${gap}% gap is hidden fees`:''}</div>`:''}
+    ${isEst?`<p style="color:rgba(255,255,255,0.45);font-size:12px;margin-top:10px;">Upload your statement for exact figures</p>`:''}
+    </div><div class="result-body">`;
+
+    if(!isEst&&a.total_fees_found&&a.total_volume_found&&a.effective_rate){
+      html+=statsCard(fmtMoney(a.total_fees_found),fmtMoney(a.total_volume_found),cr);
+    }
+    if(!isEst&&a.effective_rate&&a.new_effective_rate_estimated){
+      html+=rateCompare(cr,nr,gap,hl);
+    }
+    if(a.fee_breakdown?.length){
+      html+=`<table class="breakdown-table"><thead><tr><th>Fee item</th><th>${isEst?'Typical → Celero':'Current → Celero'}</th><th>Annual saving</th></tr></thead><tbody>`;
+      for(const item of a.fee_breakdown){
+        html+=`<tr><td><div class="fee-name">${item.fee_name}</div>${item.severity==='high'?'<span class="overpay-badge">Overpaying</span>':''}<div class="fee-detail">${item.note}</div></td><td><div class="fee-detail">${item.current_amount||item.current_rate||''}</div><div style="font-size:12px;color:var(--green);margin-top:2px">→ ${item.celero_amount||item.celero_rate||''}</div></td><td class="saving-amount">$${(item.annual_saving||0).toLocaleString()}${isEst?'*':''}</td></tr>`;
+      }
+      html+=`</tbody></table>`;
+      if(isEst) html+=`<p style="font-size:12px;color:var(--text-light);margin-bottom:16px;">* Estimates based on typical industry rates. Exact figures confirmed by full statement review.</p>`;
+    }
+    if(dualEligible) html+=dualCallout();
+    html+=beyondNumbers(pains,false);
+    const rawMsg = a.prospect_message||(isEst?`This is a ballpark — your real number comes from your actual statement. Send it over and I'll do a full review within 2 business days.`:`These numbers come directly from your statement. Book a quick call and I'll walk you through exactly what switching looks like.`);
+    // Cap to 2 sentences max for display
+    const sentences = rawMsg.match(/[^.!?]+[.!?]+/g)||[rawMsg];
+    const msg = sentences.slice(0,2).join(' ').trim();
+    html+=nextSteps(msg,true);
+    html+='</div>';
+  }
+
+  html+=`<div class="disclaimer">Analysis is ${type.includes('no_statement')||type==='smb_low_savings'?'estimated from industry benchmarks':'based on your submitted statement'}. Estimated new rate is based on typical Celero pricing — your exact quote is confirmed on a call. No commitment required. · <a href="https://celerocommerce.com" target="_blank" style="color:var(--blue-light)">celerocommerce.com</a></div>`;
+  screen.innerHTML=html;
+}
+
+</script>
+</body>
+</html>
